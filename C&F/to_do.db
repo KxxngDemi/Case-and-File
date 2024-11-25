@@ -1,0 +1,9 @@
+SELECT name FROM sqlite_master WHERE type='table';
+
+CREATE TABLE IF NOT EXISTS Tasks (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    completed BOOLEAN,
+    due_date TEXT
+); 
