@@ -37,6 +37,16 @@ def create_new_db():
             Completed TIMESTAMP
         );
         """)
+        
+        # Create user table
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL,
+            password TEXT NOT NULL
+        );
+        """)
 
         connection.commit()
         print("Database and tables created successfully.")

@@ -1,5 +1,6 @@
 import tkinter as tk
 import os
+import subprocess
 
 from tkinter import messagebox
 from typing import List, Optional
@@ -96,7 +97,8 @@ class SignInWindow(tk.Toplevel):
                 self.home_page.current_user = user
                 messagebox.showinfo("Success", f"Welcome back, {user.name}!")  
                 self.destroy()
-                return os.system('python3 to_do_list.py')
+                todo = subprocess.run(['python3', 'to_do_list.py'], check=True, text=True, capture_output=True)
+                return todo.returncode 
                 
         messagebox.showerror("Error", "Invalid name or password")
 
