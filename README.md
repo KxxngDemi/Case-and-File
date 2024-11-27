@@ -2,7 +2,7 @@
 
 Group Project for COMP2140.
 
-Built with Python 3, SQLite and PyQt5.
+Built with Python 3, SQLite, Tkinter and PyQt5.
 
 # SRS
 
