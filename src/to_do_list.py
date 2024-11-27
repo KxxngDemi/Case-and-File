@@ -26,11 +26,4 @@ if __name__ == "__main__":
     main_window = ToDoWindow()
     main_window.show()
     main_window.raise_()
-    #creates new database when run for the first time
-    if not os.path.exists("to_do.db"):
-        create_new_db("to_do.db")
-        new_db = QMessageBox()
-        new_db.setWindowTitle("New Database")
-        new_db.setText("New database created")
-        new_db.exec_()
     to_do.exec_()
