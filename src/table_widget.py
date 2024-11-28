@@ -1,10 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-
 from datetime import datetime
-
 from db_controller import *
-
 
 class TableWidget(QTableWidget):
 

@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import *
-
 from db_controller import *
 
 class DeleteTaskDialog(QDialog):

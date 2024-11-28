@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import *
-
 from db_controller import *
 from table_widget import *
 from add_new_dialog import *

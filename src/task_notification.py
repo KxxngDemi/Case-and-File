@@ -4,6 +4,7 @@ import sys
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
+import schedule
 import time
 
 
@@ -27,27 +28,24 @@ class TaskNotification:
         tasks = cursor.fetchall()
         conn.close()
 
-        if tasks:  # Check if tasks is not empty
+        if tasks:  
             return [task[0] for task in tasks]
         else:
-            return []  # Return an empty list if no tasks are due
+            return []  
 
     def send_email(self, subject, body):
         """Send an email with the specified subject and body."""
         try:
-            # Set up the MIME
             message = MIMEMultipart()
             message["From"] = self.sender_email
             message["To"] = self.recipient_email
             message["Subject"] = subject
             message.attach(MIMEText(body, "plain"))
 
-            # Connect to the SMTP server
             server = smtplib.SMTP("smtp.gmail.com", 587)
             server.starttls()
             server.login(self.sender_email, self.sender_password)
 
-            # Send the email
             server.sendmail(self.sender_email, self.recipient_email, message.as_string())
             print("Email sent successfully!")
         except Exception as e:
@@ -57,11 +55,10 @@ class TaskNotification:
 
     def task_email_scheduler(self):
         """Check for tasks due today and send an email."""
-        today = datetime.now().date()  # Get today's date
+        today = datetime.now().date()  
         tasks_due_today = self.get_tasks_due(today)
 
         if tasks_due_today:
-            # Compose email
             task_list = "\n- ".join(tasks_due_today)
             body = (
                  "Good morning,\n\n"
@@ -83,18 +80,14 @@ class TaskNotification:
     def run_scheduler(self):
         """Runs a loop for the scheduler"""
         print("Task email scheduler is running...")
-        while True:
-            schedule.run_pending()
-            time.sleep(30)  # Check every 30 seconds
+        try:
+            while True:
+                schedule.run_pending()
+                time.sleep(30)  
+        except KeyboardInterrupt:
+            print("Scheduler has stopped!")
 
-
-# Example usage
-# if __name__ == "__main__":
-#     # Initialize the TaskReminder class
-#     reminder = TaskNotification()
-
-#     # Schedule the email to be sent at 8:00 am daily
-#     reminder.schedule_email("08:00")
-
-#     # Run the scheduler
-#     reminder.run_scheduler()
+if __name__ ==  "__main__":
+    reminder = TaskNotification()
+    reminder.schedule_email("08:00")
+    reminder.run_scheduler()

@@ -1,8 +1,5 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-
-import os
-
 from db_controller import *
 from radio_button_widget import *
 from table_widget import *

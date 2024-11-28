@@ -3,10 +3,7 @@ import os
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-
-from create_new_db import *
 from tab_widget import *
-from task_notification import *
 
 class ToDoWindow(QMainWindow):
     
@@ -23,12 +20,8 @@ class ToDoWindow(QMainWindow):
         self.central_widget.project_exit_button.clicked.connect(self.close)
 
 if __name__ == "__main__":
-    #create_new_db()
     to_do = QApplication(sys.argv)
     main_window = ToDoWindow()
     main_window.show()
     main_window.raise_()
     to_do.exec_()
-    reminder = TaskNotification()
-    reminder.schedule_email("08:00")
-    reminder.run_scheduler()

@@ -4,14 +4,11 @@ import os
 def create_new_db():
     """Sets up tables for a new database"""
     db_path = 'to_do.db'
+  
 
-    # Check if the file already exists and prompt the user
-    
-    # Create a new database
     with sqlite3.connect(db_path) as connection:
         cursor = connection.cursor()
 
-        # Create tasks table
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS Tasks (
             TaskID INTEGER PRIMARY KEY,
@@ -24,7 +21,6 @@ def create_new_db():
         );
         """)
 
-        # Create projects table
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS Projects (
             ProjectID INTEGER PRIMARY KEY,
@@ -35,7 +31,6 @@ def create_new_db():
         );
         """)
         
-        # Create user table
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             name TEXT NOT NULL,
