@@ -47,6 +47,12 @@ class EditDialog(QDialog):
         else:
             self.deadline_calendar_widget.setEnabled(True)
 
+    def show_confirmation_message(self, message):
+        confirmation_dialog = QMessageBox()
+        confirmation_dialog.setWindowTitle(" ")
+        confirmation_dialog.setInformativeText(message)
+        confirmation_dialog.exec_()
+
 
 class EditTaskDialog(EditDialog):
 
@@ -59,10 +65,10 @@ class EditTaskDialog(EditDialog):
         self.task_details = self.get_task_details()
 
         self.description_line_edit.setText(self.task_details[0][1])
-        if self.task_details[0][2] == None:
+        if self.task_details[0][2] is None:
             self.no_deadline_checkbox.setChecked(True)
             self.deadline_calendar_widget.setEnabled(False)
-        else: 
+        else:
             self.deadline_calendar_widget.setSelectedDate(QDate.fromString(self.task_details[0][2], "yyyy-MM-dd"))
 
         self.project_assign_label = QLabel("Assign to Project")
@@ -91,32 +97,26 @@ class EditTaskDialog(EditDialog):
         self.save_edit_button.clicked.connect(self.edit_task)
 
     def get_task_details(self):
-        task_details = self.controller.get_single_task(self.task_id)
-        return task_details
+        return self.controller.get_single_task(self.task_id)
 
     def get_project_list(self):
-        project_list = []
-        for entry in self.controller.get_all_projects():
-            project_list.append(str(entry[0])+": "+entry[1])
-        return project_list
+        return [f"{entry[0]}: {entry[1]}" for entry in self.controller.get_all_projects()]
 
     def edit_task(self):
-        if self.description_line_edit.textEdited:
-            description = self.description_line_edit.text()
+        description = self.description_line_edit.text() if self.description_line_edit.textEdited else None
+        deadline = None if self.no_deadline_checkbox.isChecked() else self.deadline_calendar_widget.selectedDate().toPyDate()
+        project_id = None if self.project_assign_combobox.currentText() == "None" else int(self.project_assign_combobox.currentText()[0])
+
+        if description:
             self.controller.edit_task_description(self.task_id, description)
-        if self.deadline_calendar_widget.selectionChanged:
-            if self.no_deadline_checkbox.isChecked():
-                deadline = None
-            else:
-                deadline = self.deadline_calendar_widget.selectedDate().toPyDate()
+        if deadline:
             self.controller.set_task_deadline(self.task_id, deadline)
-        if self.project_assign_combobox.currentIndex() != self.current_index:        
-            if self.project_assign_combobox.currentText() == "None":
-                project_id = None
-            else:
-                project_id = int(self.project_assign_combobox.currentText()[0])
+        if project_id != self.current_index:
             self.controller.assign_task_to_project(self.task_id, project_id)
+
+        self.show_confirmation_message("Task updated successfully.")
         self.close()
+
 
 class EditProjectDialog(EditDialog):
 
@@ -129,7 +129,7 @@ class EditProjectDialog(EditDialog):
         self.project_details = self.get_project_details()
 
         self.description_line_edit.setText(self.project_details[0][1])
-        if self.project_details[0][2] == None:
+        if self.project_details[0][2] is None:
             self.no_deadline_checkbox.setChecked(True)
             self.deadline_calendar_widget.setEnabled(False)
         else:
@@ -144,19 +144,16 @@ class EditProjectDialog(EditDialog):
         self.save_edit_button.clicked.connect(self.edit_project)
 
     def get_project_details(self):
-        project_details = self.controller.get_single_project(self.project_id)
-        return project_details
+        return self.controller.get_single_project(self.project_id)
 
     def edit_project(self):
-        if self.description_line_edit.textEdited:
-            description = self.description_line_edit.text()
+        description = self.description_line_edit.text() if self.description_line_edit.textEdited else None
+        deadline = None if self.no_deadline_checkbox.isChecked() else self.deadline_calendar_widget.selectedDate().toPyDate()
+
+        if description:
             self.controller.edit_project_description(self.project_id, description)
-        if self.deadline_calendar_widget.selectionChanged:
-            if self.no_deadline_checkbox.isChecked():
-                deadline = None
-            else:
-                deadline = self.deadline_calendar_widget.selectedDate().toPyDate()
+        if deadline:
             self.controller.set_project_deadline(self.project_id, deadline)
+
+        self.show_confirmation_message("Project updated successfully.")
         self.close()
-
-
