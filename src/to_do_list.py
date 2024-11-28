@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import *
 
 from create_new_db import *
 from tab_widget import *
+from task_notification import *
 
 class ToDoWindow(QMainWindow):
     
@@ -28,3 +29,6 @@ if __name__ == "__main__":
     main_window.show()
     main_window.raise_()
     to_do.exec_()
+    reminder = TaskNotification()
+    reminder.schedule_email("08:00")
+    reminder.run_scheduler()
