@@ -40,10 +40,7 @@ class AddNewDialog(QDialog):
         self.save_new_button.setEnabled(True)
 
     def toggle_calendar(self):
-        if self.no_deadline_checkbox.isChecked():
-            self.deadline_calendar_widget.setEnabled(False)
-        else:
-            self.deadline_calendar_widget.setEnabled(True)
+        self.deadline_calendar_widget.setEnabled(not self.no_deadline_checkbox.isChecked())
 
 class NewTaskDialog(AddNewDialog):
 
@@ -71,21 +68,12 @@ class NewTaskDialog(AddNewDialog):
         self.save_new_button.clicked.connect(self.add_new_task)
 
     def get_project_list(self):
-        project_list = []
-        for entry in self.controller.get_all_projects():
-            project_list.append(str(entry[0])+": "+entry[1])
-        return project_list
+        return [f"{entry[0]}: {entry[1]}" for entry in self.controller.get_all_projects()]
 
     def add_new_task(self):
         description = self.description_line_edit.text()
-        if self.no_deadline_checkbox.isChecked():
-            deadline = None
-        else:
-            deadline = self.deadline_calendar_widget.selectedDate().toPyDate()
-        if self.project_assign_combobox.currentText() == "None":
-            project_id = None
-        else:
-            project_id = int(self.project_assign_combobox.currentText()[0])
+        deadline = None if self.no_deadline_checkbox.isChecked() else self.deadline_calendar_widget.selectedDate().toPyDate()
+        project_id = None if self.project_assign_combobox.currentText() == "None" else int(self.project_assign_combobox.currentText()[0])
         self.controller.add_task(description, deadline, project_id)
         self.close()
 
@@ -100,10 +88,7 @@ class NewProjectTaskDialog(NewTaskDialog):
 
     def add_new_task(self):
         description = self.description_line_edit.text()
-        if self.no_deadline_checkbox.isChecked():
-            deadline = None
-        else:
-            deadline = self.deadline_calendar_widget.selectedDate().toPyDate()
+        deadline = None if self.no_deadline_checkbox.isChecked() else self.deadline_calendar_widget.selectedDate().toPyDate()
         self.controller.add_task(description, deadline, self.project_id)
         self.close()
 
@@ -124,10 +109,7 @@ class NewProjectDialog(AddNewDialog):
 
     def add_new_project(self):
         description = self.description_line_edit.text()
-        if self.no_deadline_checkbox.isChecked():
-            deadline = None
-        else:
-            deadline = self.deadline_calendar_widget.selectedDate().toPyDate()
+        deadline = None if self.no_deadline_checkbox.isChecked() else self.deadline_calendar_widget.selectedDate().toPyDate()
         self.controller.add_project(description, deadline)
         self.close()
 

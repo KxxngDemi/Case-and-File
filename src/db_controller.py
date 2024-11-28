@@ -2,9 +2,8 @@ import sqlite3
 from datetime import datetime
 
 class DbController:
-    """Allows user to update task and projects in database"""
     def __init__(self, db_name):
-        self.db_name = db_name           
+        self.db_name = db_name
 
     def query(self, sql, data):
         with sqlite3.connect(self.db_name) as db:
@@ -13,29 +12,26 @@ class DbController:
             cursor.execute(sql, data)
             db.commit()
 
-    def select_query(self,sql,data=None):
+    def select_query(self, sql, data=None):
         with sqlite3.connect(self.db_name) as db:
             cursor = db.cursor()
             cursor.execute("PRAGMA foreign_keys = ON")
-            if data:
-                cursor.execute(sql,data)
-            else:
-                cursor.execute(sql)
-            results = cursor.fetchall()
-        return results
+            cursor.execute(sql, data) if data else cursor.execute(sql)
+            return cursor.fetchall()
 
     def add_task(self, description, deadline, project_id):
         created = datetime.now()
-        sql_add_task =  "INSERT INTO Tasks (Description, Deadline, Created, ProjectID) VALUES (?,?,?,?)"
-        self.query(sql_add_task, (description, deadline, created, project_id))
+        sql = "INSERT INTO Tasks (Description, Deadline, Created, ProjectID) VALUES (?,?,?,?)"
+        self.query(sql, (description, deadline, created, project_id))
 
     def add_project(self, description, deadline):
         created = datetime.now()
-        sql_add_project =  "INSERT INTO Projects (Description, Deadline, Created) VALUES (?,?,?)"
-        self.query(sql_add_project, (description, deadline, created))
+        sql = "INSERT INTO Projects (Description, Deadline, Created) VALUES (?,?,?)"
+        self.query(sql, (description, deadline, created))
 
     def delete_task(self, task_id):
-        self.query("DELETE FROM Tasks WHERE TaskID = ?", (task_id,))
+        sql = "DELETE FROM Tasks WHERE TaskID = ?"
+        self.query(sql, (task_id,))
 
     def delete_project_only(self, project_id):
         self.query("UPDATE Tasks SET ProjectID = NULL WHERE ProjectID = ?", (project_id,))
@@ -47,87 +43,73 @@ class DbController:
 
     def mark_task_completed(self, task_id):
         completed = datetime.now()
-        sql_mark_completed =  "UPDATE Tasks SET Completed = ? WHERE TaskID = ?"
-        self.query(sql_mark_completed, (completed, task_id))
+        sql = "UPDATE Tasks SET Completed = ? WHERE TaskID = ?"
+        self.query(sql, (completed, task_id))
 
     def mark_project_completed(self, project_id):
         completed = datetime.now()
-        sql_mark_completed =  "UPDATE Projects SET Completed = ? WHERE ProjectID = ?"
-        self.query(sql_mark_completed, (completed, project_id))
+        sql = "UPDATE Projects SET Completed = ? WHERE ProjectID = ?"
+        self.query(sql, (completed, project_id))
 
     def mark_project_tasks_completed(self, project_id):
         completed = datetime.now()
-        sql_mark_completed =  "UPDATE Tasks SET Completed = ? WHERE ProjectID = ?"
-        self.query(sql_mark_completed, (completed, project_id))
+        sql = "UPDATE Tasks SET Completed = ? WHERE ProjectID = ?"
+        self.query(sql, (completed, project_id))
 
     def get_task_project_id(self, task_id):
-        sql_get_project_id = "SELECT ProjectID FROM Tasks WHERE TaskID = ?"
-        results = self.select_query(sql_get_project_id, (task_id,))
-        return results[0][0]
+        sql = "SELECT ProjectID FROM Tasks WHERE TaskID = ?"
+        return self.select_query(sql, (task_id,))[0][0]
 
     def check_project_tasks_completed(self, project_id):
-        sql_check_project = "SELECT TaskID FROM Tasks WHERE ProjectID = ? AND Completed IS NULL"
-        results = self.select_query(sql_check_project, (project_id,))
-        if not results:
-            return True
-        return False
-        
+        sql = "SELECT TaskID FROM Tasks WHERE ProjectID = ? AND Completed IS NULL"
+        return not self.select_query(sql, (project_id,))
+
     def edit_task_description(self, task_id, description):
-        sql_edit_descr = "UPDATE Tasks SET Description = ? WHERE TaskID = ?"
-        self.query(sql_edit_descr, (description, task_id))
+        sql = "UPDATE Tasks SET Description = ? WHERE TaskID = ?"
+        self.query(sql, (description, task_id))
 
     def set_task_deadline(self, task_id, deadline):
-        sql_set_deadline = "UPDATE Tasks SET Deadline = ? WHERE TaskID = ?"
-        self.query(sql_set_deadline, (deadline, task_id))
+        sql = "UPDATE Tasks SET Deadline = ? WHERE TaskID = ?"
+        self.query(sql, (deadline, task_id))
 
     def assign_task_to_project(self, task_id, project_id):
-        sql_assign_task = "UPDATE Tasks SET ProjectID = ? WHERE TaskID = ?"
-        self.query(sql_assign_task, (project_id, task_id))
+        sql = "UPDATE Tasks SET ProjectID = ? WHERE TaskID = ?"
+        self.query(sql, (project_id, task_id))
 
     def set_project_deadline(self, project_id, deadline):
-        sql_set_deadline = "UPDATE Projects SET Deadline = ? WHERE ProjectID = ?"
-        self.query(sql_set_deadline, (deadline, project_id))
+        sql = "UPDATE Projects SET Deadline = ? WHERE ProjectID = ?"
+        self.query(sql, (deadline, project_id))
 
     def edit_project_description(self, project_id, description):
-        sql_edit_descr = "UPDATE Projects SET Description = ? WHERE ProjectID = ?"
-        self.query(sql_edit_descr, (description, project_id))
+        sql = "UPDATE Projects SET Description = ? WHERE ProjectID = ?"
+        self.query(sql, (description, project_id))
 
     def get_all_tasks(self):
-        results = self.select_query("SELECT * FROM Tasks")
-        return results
+        return self.select_query("SELECT * FROM Tasks")
 
     def get_active_tasks(self):
-        results = self.select_query("SELECT * FROM Tasks WHERE Completed IS NULL")
-        return results
+        return self.select_query("SELECT * FROM Tasks WHERE Completed IS NULL")
 
     def get_completed_tasks(self):
-        results = self.select_query("SELECT * FROM Tasks WHERE Completed IS NOT NULL")
-        return results
+        return self.select_query("SELECT * FROM Tasks WHERE Completed IS NOT NULL")
 
     def get_single_task(self, task_id):
-        results = self.select_query("SELECT * FROM Tasks WHERE TaskID = ?", (task_id,))
-        return results
+        return self.select_query("SELECT * FROM Tasks WHERE TaskID = ?", (task_id,))
 
     def get_all_projects(self):
-        results = self.select_query("SELECT * FROM Projects")
-        return results
+        return self.select_query("SELECT * FROM Projects")
 
     def get_active_projects(self):
-        results = self.select_query("SELECT * FROM Projects WHERE Completed IS NULL")
-        return results
+        return self.select_query("SELECT * FROM Projects WHERE Completed IS NULL")
 
     def get_completed_projects(self):
-        results = self.select_query("SELECT * FROM Projects WHERE Completed IS NOT NULL")
-        return results
-       
+        return self.select_query("SELECT * FROM Projects WHERE Completed IS NOT NULL")
+
     def get_single_project(self, project_id):
-        results = self.select_query("SELECT * FROM Projects WHERE ProjectID = ?", (project_id,))
-        return results
+        return self.select_query("SELECT * FROM Projects WHERE ProjectID = ?", (project_id,))
 
     def get_project_tasks(self, project_id):
-        results = self.select_query("SELECT * FROM Tasks WHERE ProjectID = ?", (project_id,))
-        return results
-
+        return self.select_query("SELECT * FROM Tasks WHERE ProjectID = ?", (project_id,))
 
 
 
