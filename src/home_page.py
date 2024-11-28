@@ -99,7 +99,7 @@ class SignInWindow(tk.Toplevel):
             todo = subprocess.Popen(
             ['python3', 'to_do_list.py'],
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, 
+            stderr=subprocess.PIPE,
             text=True
         )
             stdout, stderr = todo.communicate()
