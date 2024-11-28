@@ -2,16 +2,8 @@
 
 Group Project for COMP2140.
 
-Built with Python 3, SQLite, Tkinter and PyQt5.
+Built with Python 3, SQLite3 and PyQt5.
+It uses os, Tkinter, subprocess, sys and datetime standard libaray from Python
+It was tested with Pytest
 
-# SRS
-
-Todo: Place SRS document here
-
-# SDS
-
-Todo: Place SDS document here
-
-# Test Plan
-
-Todo: Place Test Plan document here
+# Screenshots

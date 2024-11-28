@@ -22,7 +22,7 @@ class ToDoWindow(QMainWindow):
         self.central_widget.project_exit_button.clicked.connect(self.close)
 
 if __name__ == "__main__":
-    create_new_db()
+    #create_new_db()
     to_do = QApplication(sys.argv)
     main_window = ToDoWindow()
     main_window.show()

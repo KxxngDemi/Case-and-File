@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-import json
 import os
 
 from db_controller import *
