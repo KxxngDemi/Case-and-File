@@ -1,6 +1,7 @@
 import tkinter as tk
 import os
 import subprocess
+import sqlite3
 
 from tkinter import messagebox
 from typing import List, Optional
@@ -11,7 +12,7 @@ class HomePage(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.users: List[User] = []  # Store registered users
+        self.users: List[User] = []
         self.current_user: Optional[User] = None
         self.setup_window()
         self.create_widgets()
@@ -46,15 +47,7 @@ class HomePage(tk.Frame):
             width=15
         )
         self.sign_in_btn.pack(pady=5)
-
-        self.sign_up_btn = tk.Button(
-            self.pnl_display,
-            text="Sign Up",
-            command=self.show_sign_up_window,
-            width=15
-        )
-        self.sign_up_btn.pack(pady=5)
-      
+    
         self.exit_btn = tk.Button(
             self.pnl_display,
             text="Exit",
@@ -62,12 +55,9 @@ class HomePage(tk.Frame):
             width=15
         )
         self.exit_btn.pack(pady=5)
-        
+                
     def show_sign_in_window(self):
         SignInWindow(self)
-
-    def show_sign_up_window(self):
-        SignUpWindow(self)
 
 class SignInWindow(tk.Toplevel):
     def __init__(self, home_page):
@@ -91,53 +81,31 @@ class SignInWindow(tk.Toplevel):
     def attempt_sign_in(self):
         name = self.name_entry.get()
         password = self.password_entry.get()
+
+        conn = sqlite3.connect('to_do.db')
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT name, password FROM users WHERE name = ? AND password = ?", (name , password))
+
+        user_row = cursor.fetchone()
         
-        for user in self.home_page.users:
-            if user.sign_in(name, password):
-                self.home_page.current_user = user
-                messagebox.showinfo("Success", f"Welcome back, {user.name}!")  
-                self.destroy()
-                todo = subprocess.run(['python3', 'to_do_list.py'], check=True, text=True, capture_output=True)
-                return todo.returncode 
-                
-        messagebox.showerror("Error", "Invalid name or password")
-
-class SignUpWindow(tk.Toplevel):
-    def __init__(self, home_page):
-        super().__init__(home_page.master)
-        self.home_page = home_page
-        self.title("Sign Up")
-        self.geometry("400x500")
-        self.create_widgets()
-
-    def create_widgets(self):
-        tk.Label(self, text="First Name:").pack(pady=5)
-        self.f_name_entry = tk.Entry(self)
-        self.f_name_entry.pack(pady=5)
-
-        tk.Label(self, text="Last Name:").pack(pady=5)
-        self.l_name_entry = tk.Entry(self)
-        self.l_name_entry.pack(pady=5)
-
-        tk.Label(self, text="Password:").pack(pady=5)
-        self.password_entry = tk.Entry(self, show="*")
-        self.password_entry.pack(pady=5)
-
-        tk.Button(self, text="Sign Up", command=self.create_user).pack(pady=10)
-
-    def create_user(self):
-        try:
-            new_user = User(
-                password=self.password_entry.get(),
-                f_name=self.f_name_entry.get(),
-                l_name=self.l_name_entry.get(),
-                next_id=len(self.home_page.users) + 1
-            )
-            self.home_page.users.append(new_user)
-            messagebox.showinfo("Success", "User registered successfully!")
+        if user_row:
+            name, password = user_row
+            user = User(name=name, password=password)
+                                
+            self.home_page.current_user = user
+            messagebox.showinfo("Success", f"Welcome back, {user.name}!")  
             self.destroy()
-        except ValueError:
-            messagebox.showerror("Error", "Please check your input values")
+            todo = subprocess.Popen(
+            ['python3', 'to_do_list.py'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, 
+            text=True
+        )
+            stdout, stderr = todo.communicate()
+        else: 
+            messagebox.showerror("Error", "Invalid name or password")
+                
 
 if __name__ == "__main__":
     root = tk.Tk()

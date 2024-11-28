@@ -6,10 +6,7 @@ def create_new_db():
     db_path = 'to_do.db'
 
     # Check if the file already exists and prompt the user
-    if os.path.exists(db_path):
-        print("Database file already exists. Recreating it...")
-        os.remove(db_path)
-
+    
     # Create a new database
     with sqlite3.connect(db_path) as connection:
         cursor = connection.cursor()
@@ -41,11 +38,14 @@ def create_new_db():
         # Create user table
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            first_name TEXT NOT NULL,
-            last_name TEXT NOT NULL,
+            name TEXT NOT NULL,
             password TEXT NOT NULL
         );
+        """)
+
+        cursor.execute("""
+            INSERT INTO users (name, password)
+            VALUES ('Kingdom_Chambers', 'password123')
         """)
 
         connection.commit()
